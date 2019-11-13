@@ -7,14 +7,39 @@
 require('./bootstrap');
 import "@fortawesome/fontawesome-free/js/all.js";
 import { Form, HasError, AlertError } from "vform";
+import moment from 'moment';
+import VueProgressBar from 'vue-progressbar'
+import Swal from "sweetalert2";
+
+
+
+const Toast = Swal.mixin({
+    toast: true,
+    position: 'top-end',
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+    onOpen: (toast) => {
+        toast.addEventListener('mouseenter', Swal.stopTimer)
+        toast.addEventListener('mouseleave', Swal.resumeTimer)
+    }
+})
+window.Toast = Toast;
+
+window.moment = moment;
 window.Vue = require('vue');
 import VueRouter from 'vue-router';
 Vue.use(VueRouter);
 
-window.form = Form;
+window.Form = Form;
+
 Vue.component(HasError.name, HasError);
 Vue.component(AlertError.name, AlertError);
-
+Vue.use(VueProgressBar, {
+    color: "rgb(143, 255, 199)",
+    failedColor: "red",
+    height: "3px"
+});
 import routes from './routes';
 /**
  * The following block of code may be used to automatically register your
@@ -27,7 +52,13 @@ import routes from './routes';
 // const files = require.context('./', true, /\.vue$/i)
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
-Vue.component('example-component', require('./components/ExampleComponent.vue').default);
+Vue.filter('upText', function(text){
+return text.charAt(0).toUpperCase() + text.slice(1);
+})
+
+Vue.filter('myDate', function (created) {
+    return moment(created).format("MMMM Do YYYY");
+})
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to

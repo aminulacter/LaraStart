@@ -4,6 +4,8 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\User;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -14,7 +16,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        //
+        return User::latest()->paginate(10);
     }
 
     /**
@@ -25,9 +27,24 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        //
-    }
+        request()->validate([
+            'name' => 'required',
+            'email' => 'required|unique:users|max:255',
+            'type' => 'required',
+            'bio'  => 'required',
+            'password' =>'required|min:8'
+        ]);
 
+        
+        return User::create([
+            'name' => request()->name,
+            'email'=> request()->email,
+            'type'=> request()->type,
+            'bio'=> request()->bio,
+            'password'=> Hash::make(request()->password)
+            ]);
+    }
+    
     /**
      * Display the specified resource.
      *

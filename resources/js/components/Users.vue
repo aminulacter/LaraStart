@@ -19,15 +19,18 @@
                       <th>Name</th>
                       <th>Email</th>
                       <th>Type</th>
+                      <th>Registered At</th>
                       <th>Modify</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <td>183</td>
-                      <td>John Doe</td>
-                      <td>11-7-2014</td>
-                      <td><span class="tag tag-success">Approved</span></td>
+                    <tr v-for="(user,index) in users" :key="index">
+                      <td>{{ index }}</td>
+                      <td>{{ user.name }}</td>
+                      <td>{{ user.email }}</td>
+                      <td>{{ user.type | upText }}</td>
+                      <td>{{ user.updated_at | myDate }}</td>
+                     
                       <td>
                           <a href="#">
                               <i class="fas fa-edit blue"></i>
@@ -89,7 +92,7 @@
                
                 <select name="type" v-model="form.type" id="type" class="form-control" :class="{ 'is-invalid': form.errors.has('password') }">
                     <option value="">Select User Role</option>
-                    <option value="admin">Adim</option>
+                    <option value="admin">Admin</option>
                     <option value="user">User</option>
                     <option value="author">Author</option>
                 </select>
@@ -97,7 +100,7 @@
                 </div>
                  <div class="form-group">
                
-                <input v-model="form.password" type="text" name="password"
+                <input v-model="form.password" type="password" name="password"
                     placeholder="Password"
                     class="form-control" :class="{ 'is-invalid': form.errors.has('password') }">
                 <has-error :form="form" field="password"></has-error>
@@ -105,7 +108,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">create</button>
+                <button type="submit" class="btn btn-primary">create</button>
             </div>
             </form>
            
@@ -116,10 +119,12 @@
 </template>
 
 <script>
+
     export default {
         data() {
             return {
-               form: new form({
+               users: [],
+               form: new Form({
                    name: '',
                    email: '',
                    password:'',
@@ -132,11 +137,26 @@
         methods:{
           createUser()
           {
+            this.$Progress.start()
             this.form.post('api/user');
+            $('addNew').modal('hide')
+            Toast.fire({
+            icon: 'success',
+            title: 'User Created successfully'
+            })
+            this.$Progress.finish()
+          },
+          loadUsers()
+          {
+              axios.get("api/user").then(({data}) => {
+                  this.users = data.data
+                  
+                  })
+             
           }
         },
-        mounted() {
-            console.log('Component mounted.')
+        created() {
+           this.loadUsers();
         }
     }
 </script>
