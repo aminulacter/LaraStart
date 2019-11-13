@@ -26,3 +26,5 @@ Route::get('/home', 'HomeController@index')->name('home');
 Route::get('/{any}', function () {
     return view('home');
 })->where('any', '.*');
+
+Route::apiResource('user', 'API\UserController');
