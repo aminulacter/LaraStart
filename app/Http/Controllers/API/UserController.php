@@ -14,6 +14,11 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    public function __construct()
+    {
+        $this->middleware('auth:api');
+    }
+
     public function index()
     {
         return User::latest()->paginate(10);
@@ -63,9 +68,23 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, User $user)
     {
-        //
+        request()->validate([
+            'name' => 'required',
+            'email' => 'required|unique:users|max:255',
+            'type' => 'required',
+            'bio'  => 'required',
+            'password' =>'required|min:8'
+        ]);
+        $user->name = request()->name;
+        $user->email= request()->email;
+        $user->type= request()->type;
+        $user->bio= request()->bio;
+        $user->password= Hash::make(request()->password);
+        $user->save();
+        return response()->json(['user' => $user]);
+
     }
 
     /**
@@ -74,8 +93,14 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(User $user)
     {
-        //
-    }
+        $name = $user->name;
+        $user->delete();
+       return response()->json(['message' => $name . "is Deleted"]);
+    //    return response()->json([
+    //     'name' => 'Abigail',
+    //     'state' => 'CA'
+    // ]);
+  }
 }

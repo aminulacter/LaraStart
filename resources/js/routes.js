@@ -1,5 +1,6 @@
 import Dashboard from "./components/Dashboard";
 import Profile from "./components/Profile";
+import Developer from "./components/Developer";
 import Users from "./components/Users";
 
 
@@ -16,6 +17,10 @@ export default {
         {
             path: "/profile",
             component: Profile
+        },
+        {
+            path: "/developer",
+            component: Developer
         },
         {
             path: "/users",

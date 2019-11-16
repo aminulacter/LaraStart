@@ -7,7 +7,7 @@
                 <h3 class="card-title">Users Table</h3>
 
                 <div class="card-tools">
-                  <button class="btn btn-success" data-toggle="modal" data-target="#addNew"> Add New <i class="fas fa-user-plus fa-fw"></i></button>
+                  <button class="btn btn-success" @click="openModal"> Add New <i class="fas fa-user-plus fa-fw"></i></button>
                 </div>
               </div>
               <!-- /.card-header -->
@@ -25,17 +25,17 @@
                   </thead>
                   <tbody>
                     <tr v-for="(user,index) in users" :key="index">
-                      <td>{{ index }}</td>
+                      <td>{{ index+1 }}</td>
                       <td>{{ user.name }}</td>
                       <td>{{ user.email }}</td>
                       <td>{{ user.type | upText }}</td>
                       <td>{{ user.updated_at | myDate }}</td>
                      
                       <td>
-                          <a href="#">
+                          <a href="#" @click.prevent="openModal(user)">
                               <i class="fas fa-edit blue"></i>
                           </a>/
-                          <a href="#">
+                          <a href="#" @click.prevent="deleteUser(user.id)">
                               <i class="fas fa-trash red"></i>
                           </a>
                       </td>
@@ -58,7 +58,7 @@
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Add New </h5>
+                <h5 class="modal-title" id="exampleModalLabel">Add New </h5> 
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
                 </button>
@@ -108,7 +108,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-                <button type="submit" class="btn btn-primary">create</button>
+                <button type="submit" class="btn btn-primary">{{ oparation }}</button>
             </div>
             </form>
            
@@ -123,6 +123,8 @@
     export default {
         data() {
             return {
+               oparation: 'Create',
+               currentSelected: 0,
                users: [],
                form: new Form({
                    name: '',
@@ -135,16 +137,62 @@
             }
         },
         methods:{
+          openModal(user)
+          {
+            this.form.reset();
+            this.oparation = "Create"
+            if(user.id)
+              {
+                this.form.name = user.name;
+                this.form.email = user.email;
+                this.form.type = user.type;
+                this.form.bio = user.bio;
+                this.form.type = user.type;
+                this.oparation = "Update"
+                this.currentSelected = user.id;
+                console.log(user)
+              }
+             
+            $('#addNew').modal('show')
+          },
           createUser()
           {
             this.$Progress.start()
-            this.form.post('api/user');
-            $('addNew').modal('hide')
+            
+            if(this.oparation == "Create")
+            {
+              this.form.post('api/user')
+            .then(() =>this.completLoad("Created Successfully"))
+            .catch(() =>this.uncompletLoad());
+            }
+            else{
+               this.form.patch(`api/user/${this.currentSelected}`)
+            .then(() =>this.completLoad("Updated successfully"))
+            .catch(() =>this.uncompletLoad());
+            }
+           //$('#addNew').modal('hide')
+          },
+          completLoad(message)
+          {
+            
             Toast.fire({
             icon: 'success',
-            title: 'User Created successfully'
+            title: message
             })
             this.$Progress.finish()
+            this.loadUsers();
+            $('#addNew').modal('hide')
+            // $(this.$refs.vuemodal).on("hidden.bs.modal");
+          },
+          uncompletLoad()
+          {
+            Toast.fire({
+            icon: 'error',
+            title: 'User cannot be created'
+            })
+            this.$Progress.finish()
+           // this.loadUsers();
+            //$('#addNew').modal('hide')
           },
           loadUsers()
           {
@@ -153,10 +201,27 @@
                   
                   })
              
+          },
+          deleteUser(id)
+          {
+            axios.delete(`api/user/${id}`)
+            .then((response) => { 
+              console.log(response)
+              Toast.fire({
+              icon: 'success',
+              title: 'User Deleted successfully'
+              })
+               this.loadUsers();
+
+            }).catch((error) =>{
+
+            })
+            console.log("api/user/" + id);
           }
         },
         created() {
            this.loadUsers();
+           //setInterval(() => this.loadUsers(),3000);
         }
     }
 </script>
