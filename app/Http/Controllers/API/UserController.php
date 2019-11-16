@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
@@ -61,6 +62,12 @@ class UserController extends Controller
         //
     }
 
+    public function profile()
+    {
+        //return response()->json(["user" => auth()->user()]);
+        return auth('api')->user();
+    }
+
     /**
      * Update the specified resource in storage.
      *
@@ -72,21 +79,67 @@ class UserController extends Controller
     {
         request()->validate([
             'name' => 'required',
-            'email' => 'required|unique:users|max:255',
+            'email' => [
+                'required',
+                Rule::unique('users')->ignore($user->id),
+            ],
             'type' => 'required',
             'bio'  => 'required',
-            'password' =>'required|min:8'
+            'password' =>'sometimes|required|min:8'
         ]);
+        if (request()->password) {
+            $user->password = Hash::make(request()->password);
+        }
         $user->name = request()->name;
         $user->email= request()->email;
         $user->type= request()->type;
         $user->bio= request()->bio;
-        $user->password= Hash::make(request()->password);
         $user->save();
         return response()->json(['user' => $user]);
-
     }
-
+    public function updateProfile(Request $request)
+    {
+        $user = auth()->user();
+        request()->validate([
+            'name' => 'required',
+            'email' => [
+                'required',
+                Rule::unique('users')->ignore($user->id),
+            ],
+            'type' => 'required',
+            'bio' => 'required',
+            'password' => 'sometimes|required|min:8'
+            
+        ]);
+        if ($request->photo!= $user->photo) {
+            $name = time().'.'. explode('/', explode(':', substr($request->photo, 0, strpos($request->photo, ';')))[1])[1];
+            \Image::make($request->photo)->save(public_path('img/profile/').$name);
+           
+            $request->merge(['photo' => $name]);
+            $userPhoto = public_path('img/profile/') . $user->photo;
+            //var_dump($userPhoto);
+            if (file_exists($userPhoto)) {
+                @unlink($userPhoto);
+            }
+        } else {
+            $request->merge(['photo' => $user->photo]);
+        }
+        if (request()->password) {
+            $request->merge(['password' => Hash::make(request()->password)]);
+        }
+       
+        // $user->name = request()->name;
+        // if ($user->email != request()->email) {
+        //     $user->email = request()->email;
+        // }
+        // $user->type = request()->type;
+        // $user->bio = request()->bio;
+       
+        //$user->password = Hash::make(request()->password);
+        // $user->save();
+        $user->update(request()->all());
+        return response()->json(['user' => $user]);
+    }
     /**
      * Remove the specified resource from storage.
      *
@@ -97,10 +150,10 @@ class UserController extends Controller
     {
         $name = $user->name;
         $user->delete();
-       return response()->json(['message' => $name . "is Deleted"]);
-    //    return response()->json([
+        return response()->json(['message' => $name . "is Deleted"]);
+        //    return response()->json([
     //     'name' => 'Abigail',
     //     'state' => 'CA'
     // ]);
-  }
+    }
 }

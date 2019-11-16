@@ -143,11 +143,7 @@
             this.oparation = "Create"
             if(user.id)
               {
-                this.form.name = user.name;
-                this.form.email = user.email;
-                this.form.type = user.type;
-                this.form.bio = user.bio;
-                this.form.type = user.type;
+                this.form.fill(user);
                 this.oparation = "Update"
                 this.currentSelected = user.id;
                 console.log(user)

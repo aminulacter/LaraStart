@@ -24,6 +24,7 @@ const Toast = Swal.mixin({
         toast.addEventListener('mouseleave', Swal.resumeTimer)
     }
 })
+window.Swal = Swal;
 window.Toast = Toast;
 
 window.moment = moment;
