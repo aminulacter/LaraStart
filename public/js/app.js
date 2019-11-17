@@ -6307,14 +6307,6 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
-
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
-
-function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
-
-function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
-
 //
 //
 //
@@ -6710,25 +6702,24 @@ function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
       }
 
       this.form.put('api/profile').then(function (_ref2) {
-        var _console;
-
         var data = _ref2.data;
 
-        _this3.completLoad("Updated Successfully"); // this.form.fill(data.user)
+        _this3.completLoad(data); // this.form.fill(data.user)
         //this.profileImage = this.form.photo
+        //console.log(...data)
 
-
-        (_console = console).log.apply(_console, _toConsumableArray(data));
       })["catch"](function () {
         return _this3.uncompletLoad("Sorry Update Failed");
       });
     },
-    completLoad: function completLoad(message) {
+    completLoad: function completLoad(data) {
       Toast.fire({
         icon: 'success',
-        title: message
-      });
+        title: "Profile uploaded successfully"
+      }); //console.log(data.user.photo)
+
       this.$Progress.finish();
+      this.profileImage = data.user.photo;
     },
     uncompletLoad: function uncompletLoad(message) {
       Toast.fire({
@@ -83591,8 +83582,8 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! C:\Users\Administrator\laravelprojects\bmpv\resources\js\app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! C:\Users\Administrator\laravelprojects\bmpv\resources\sass\app.scss */"./resources/sass/app.scss");
+__webpack_require__(/*! /home/aminul/laravelpro/LaraStart/resources/js/app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! /home/aminul/laravelpro/LaraStart/resources/sass/app.scss */"./resources/sass/app.scss");
 
 
 /***/ })
