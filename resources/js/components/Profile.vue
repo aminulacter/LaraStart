@@ -395,7 +395,7 @@
               this.completLoad("Updated Successfully")
                // this.form.fill(data.user)
              //this.profileImage = this.form.photo
-             console.log(...data)
+             console.log(data)
               })
             .catch(() => this.uncompletLoad("Sorry Update Failed"));
           },
@@ -406,6 +406,7 @@
             icon: 'success',
             title: message
             })
+            this.profileImage = 
             this.$Progress.finish()
           
            
