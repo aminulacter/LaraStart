@@ -22,7 +22,10 @@ class UserController extends Controller
 
     public function index()
     {
-        return User::latest()->paginate(10);
+        // $this->authorize('isAdmin');
+        if (\Gate::any(['isAdmin', 'isAuthor'])) {
+            return User::latest()->paginate(3);
+        }
     }
 
     /**
@@ -148,12 +151,9 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
+        $this->authorize('isAdmin');
         $name = $user->name;
         $user->delete();
         return response()->json(['message' => $name . "is Deleted"]);
-        //    return response()->json([
-    //     'name' => 'Abigail',
-    //     'state' => 'CA'
-    // ]);
     }
 }

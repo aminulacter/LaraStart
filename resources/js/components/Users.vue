@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <div class="row mt-5">
+        <div class="row mt-5" v-if="$gate.isAdmin()">
              <div class="col-md-12">
             <div class="card">
               <div class="card-header">
@@ -24,7 +24,7 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-for="(user,index) in users" :key="index">
+                    <tr v-for="(user,index) in users.data" :key="index">
                       <td>{{ index+1 }}</td>
                       <td>{{ user.name }}</td>
                       <td>{{ user.email }}</td>
@@ -42,6 +42,9 @@
                     </tr>
                    
                   </tbody>
+                  <tfoot>
+                    <pagination :data="users" @pagination-change-page="getResults" ></pagination>
+                  </tfoot>
                 </table>
               </div>
               <!-- /.card-body -->
@@ -52,7 +55,9 @@
         </div>
        <!-- Button trigger modal -->
        
-
+        <div v-if="!$gate.isAdmin()">
+          <not-found></not-found>
+        </div>
 <!-- Modal -->
         <div class="modal fade" id="addNew" tabindex="-1" role="dialog" aria-labelledby="addNewLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
@@ -121,11 +126,12 @@
 <script>
 
     export default {
+          
         data() {
             return {
                oparation: 'Create',
                currentSelected: 0,
-               users: [],
+               users: {},
                form: new Form({
                    name: '',
                    email: '',
@@ -151,6 +157,7 @@
              
             $('#addNew').modal('show')
           },
+        
           createUser()
           {
             this.$Progress.start()
@@ -190,13 +197,24 @@
            // this.loadUsers();
             //$('#addNew').modal('hide')
           },
+
           loadUsers()
           {
+            if(this.$gate.isAdmin()){
+
               axios.get("api/user").then(({data}) => {
-                  this.users = data.data
+                  this.users = data
                   
-                  })
+                  });
+            }    
              
+          },
+            
+          getResults(page = 1) {
+            axios.get('api/user?page=' + page)
+              .then(response => {
+                this.users = response.data;
+              });
           },
           deleteUser(id)
           {
@@ -210,13 +228,17 @@
                this.loadUsers();
 
             }).catch((error) =>{
-
+               Toast.fire({
+            icon: 'error',
+            title: 'User cannot be Deleted'
+            })
             })
             console.log("api/user/" + id);
           }
         },
         created() {
            this.loadUsers();
+         //  console.log($gate.isAdmin)
            //setInterval(() => this.loadUsers(),3000);
         }
     }

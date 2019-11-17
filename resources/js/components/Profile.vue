@@ -392,23 +392,23 @@
               }
             this.form.put('api/profile')
             .then(({data}) => {
-              this.completLoad("Updated Successfully")
+              this.completLoad(data)
                // this.form.fill(data.user)
              //this.profileImage = this.form.photo
              console.log(data)
               })
             .catch(() => this.uncompletLoad("Sorry Update Failed"));
           },
-            completLoad(message)
+            completLoad(data)
           {
             
             Toast.fire({
             icon: 'success',
-            title: message
+            title: "Profile uploaded successfully"
             })
-            this.profileImage = 
+           
             this.$Progress.finish()
-          
+            this.profileImage = data.user.photo
            
           },
           uncompletLoad(message)

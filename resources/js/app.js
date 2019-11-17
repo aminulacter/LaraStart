@@ -10,9 +10,12 @@ import { Form, HasError, AlertError } from "vform";
 import moment from 'moment';
 import VueProgressBar from 'vue-progressbar'
 import Swal from "sweetalert2";
+import Gate from "./Gate";
+
+window.Vue = require("vue");
 
 
-
+Vue.prototype.$gate = new Gate(window.user)
 const Toast = Swal.mixin({
     toast: true,
     position: 'top-end',
@@ -28,7 +31,7 @@ window.Swal = Swal;
 window.Toast = Toast;
 
 window.moment = moment;
-window.Vue = require('vue');
+
 import VueRouter from 'vue-router';
 Vue.use(VueRouter);
 
@@ -36,6 +39,7 @@ window.Form = Form;
 
 Vue.component(HasError.name, HasError);
 Vue.component(AlertError.name, AlertError);
+Vue.component("pagination", require("laravel-vue-pagination"));
 //Passport content
 Vue.component(
     'passport-clients',
@@ -46,7 +50,10 @@ Vue.component(
     'passport-authorized-clients',
     require('./components/passport/AuthorizedClients.vue').default
 );
-
+Vue.component(
+    "not-found",
+    require("./components/NotFound.vue").default
+);
 Vue.component(
     'passport-personal-access-tokens',
     require('./components/passport/PersonalAccessTokens.vue').default
@@ -89,8 +96,17 @@ Vue.filter('myDate', function (created) {
  * the page. Then, you may begin adding components to this application
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
+//console.log(window.user);
 
 const app = new Vue({
     el: "#app",
-    router: new VueRouter(routes)
+    router: new VueRouter(routes),
+    data: {
+        search: ''
+    },
+    methods:{
+        serachit(){
+            console.log('searching')
+        }
+    }
 });
